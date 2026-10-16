@@ -1,6 +1,6 @@
 ---
 title: "Lab 03 – Critical-Responsible Use of GenAI for Data Science"
-author: "Chunlin Chen, Lexuan Huang, Yamin Wang, Shihan Zhou"
+author: Team Perfect:"Chunlin Chen, Lexuan Huang, Yamin Wang, Shihan Zhou"
 date: "`r Sys.Date()`"
 output: html_document
 ---
