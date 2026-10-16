@@ -487,17 +487,22 @@ jfk_flights &lt;- jan_feb_flights %&gt;%
 <pre class="r"><code>## REMEMBER TO SET eval=TRUE
 
 # Compute the sample mean
-mean_dep_delay &lt;- jfk_flights %&gt;% ________(mean_jfk = mean(dep_delay)) %&gt;% pull(mean_jfk)
+mean_dep_delay &lt;- jfk_flights %&gt;% summarise(mean_jfk = mean(dep_delay)) %&gt;% pull(mean_jfk)
 
 # Construct bootstrap distribution
 set.seed(99)  # for reproducibility
 boot_dist &lt;- jfk_flights %&gt;%
-  ________(response = _________) %&gt;%
-  ________(reps = 1500, type = &quot;bootstrap&quot;) %&gt;%
-  ________(stat = _______)                 
+  specify(response = dep_delay) %&gt;%
+  generate(reps = 1500, type = &quot;bootstrap&quot;) %&gt;%
+  calculate(stat = &quot;mean&quot;)                 
 
 # Compute 95% confidence interval (percentile method)
-boot_dist %&gt;% ...</code></pre>
+boot_dist %&gt;% 
+  get_confidence_interval(level = 0.95, type = &quot;percentile&quot;)</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1     9.57     10.6</code></pre>
 <p><strong>Interpretation for the confidence interval</strong>:</p>
 <p><em>Your answer here</em></p>
 </div>
@@ -522,6 +527,11 @@ ci2_lower &lt;- quantile(boot_means2, 0.025)
 ci2_upper &lt;- quantile(boot_means2, 0.975)
 
 mean_dep_delay; ci2_lower; ci2_upper</code></pre>
+<pre><code>## [1] 10.10761</code></pre>
+<pre><code>##     2.5% 
+## 9.573518</code></pre>
+<pre><code>##    97.5% 
+## 10.64339</code></pre>
 </div>
 <div id="reflection-2" class="section level2">
 <h2>3.3 Reflection</h2>
@@ -540,9 +550,36 @@ arrival delays in Jan/Feb? Which is the worst on average?</p>
 
 # Join jan_feb_flights with airlines by carrier code
 jan_feb_flights &lt;- jan_feb_flights %&gt;%
-  ___________(airlines, by = &quot;carrier&quot;)</code></pre>
+  left_join(airlines, by = &quot;carrier&quot;)</code></pre>
 <pre class="r"><code># Group by airline, summarize n, mean and median arrival delay
-# Arrange descending by mean delay</code></pre>
+# Arrange descending by mean delay
+jan_feb_flights %&gt;%
+  group_by(name) %&gt;%
+  summarise(
+    n = n(),
+    mean_arr_delay = mean(arr_delay, na.rm = TRUE),
+    median_arr_delay = median(arr_delay, na.rm = TRUE)
+  ) %&gt;%
+  arrange(desc(mean_arr_delay))</code></pre>
+<pre><code>## # A tibble: 16 × 4
+##    name                            n mean_arr_delay median_arr_delay
+##    &lt;chr&gt;                       &lt;int&gt;          &lt;dbl&gt;            &lt;dbl&gt;
+##  1 SkyWest Airlines Inc.           1        107                  107
+##  2 Frontier Airlines Inc.        108         26.0                  6
+##  3 ExpressJet Airlines Inc.     7998         22.9                  6
+##  4 Endeavor Air Inc.            3032          9.29                -5
+##  5 JetBlue Airways              8530          8.38                -1
+##  6 Mesa Airlines Inc.             94          8.32                -5
+##  7 Envoy Air                    4315          7.63                -2
+##  8 AirTran Airways Corporation   624          3.75                -1
+##  9 Southwest Airlines Co.       1907          3.30                -4
+## 10 United Air Lines Inc.        8983          1.76                -4
+## 11 American Airlines Inc.       5311          1.03                -7
+## 12 US Airways Inc.              3154          0.871               -5
+## 13 Hawaiian Airlines Inc.         59          0.763              -30
+## 14 Alaska Airlines Inc.          118         -1.14                -9
+## 15 Delta Air Lines Inc.         7134         -4.56               -10
+## 16 Virgin America                587        -14.1                -17</code></pre>
 <p><strong>Which airline(s) had the highest mean? Is there anything
 notable about the worst airline?</strong></p>
 <p><em>Your answer here</em></p>
